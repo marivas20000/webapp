@@ -235,6 +235,12 @@
     <div class="list" id="groupList"></div>
   </div>
 
+  <!-- === Подразделы (Билеты/Экзамен/Марафон) === -->
+  <div id="subsectionPage" class="page">
+    <h2 id="subsectionTitle"></h2>
+    <div class="list" id="subsectionList"></div>
+  </div>
+
   <!-- === Экран вопроса === -->
   <div id="questionPage" class="page">
     <h2 id="questionTitle"></h2>
@@ -250,6 +256,7 @@
       home: document.getElementById("home"),
       profession: document.getElementById("profession"),
       group: document.getElementById("group"),
+      subsection: document.getElementById("subsectionPage"),
       question: document.getElementById("questionPage")
     };
 
@@ -316,7 +323,7 @@
     questions.forEach((q, i) => {
       const btn = document.createElement("button");
       btn.textContent = q.title;
-      btn.onclick = () => openQuestion(i);
+      btn.onclick = () => openSubsections(i);
       groupList.appendChild(btn);
     });
 
@@ -335,6 +342,27 @@
       } else {
         tg.sendData(JSON.stringify({ section }));
       }
+    }
+
+    // Открыть подразделы группы
+    function openSubsections(index) {
+      const q = questions[index];
+      showPage("subsection");
+      document.getElementById("subsectionTitle").textContent = q.title;
+
+      const list = document.getElementById("subsectionList");
+      list.innerHTML = "";
+      ["📘 Билеты", "🧾 Экзамен", "🏁 Марафон"].forEach((sub, sIndex) => {
+        const btn = document.createElement("button");
+        btn.textContent = sub;
+        btn.onclick = () => {
+          if (sIndex === 0) openQuestion(index); // "Билеты"
+          else alert(`${sub} в разработке`);
+        };
+        list.appendChild(btn);
+      });
+
+      tg.BackButton.show();
     }
 
     function openQuestion(index) {
@@ -362,7 +390,8 @@
     }
 
     tg.BackButton.onClick(() => {
-      if (pages.question.classList.contains("active")) showPage("group");
+      if (pages.question.classList.contains("active")) showPage("subsection");
+      else if (pages.subsection.classList.contains("active")) showPage("group");
       else if (pages.group.classList.contains("active")) showPage("profession");
       else if (pages.profession.classList.contains("active")) showPage("home");
       else showPage("home");
